@@ -1,15 +1,23 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
+import { AuthProvider } from "../context/AuthContext";
+import type { Metadata } from "next";
+import { Poppins } from "next/font/google";
+import { Toaster } from "sonner";
+import localFont from "next/font/local";
+
+const switzer = localFont({
+  src: "./fonts/Switzer Variable.woff2",
+  display: "swap",
+  variable: "--font-switzer",
+  style: "normal",
+  weight: "400 700",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const geistPoppins = Poppins({
+  variable: "--font-poppins",
   subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -23,11 +31,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en">
+      <body
+        className={`${geistPoppins.variable} ${switzer.variable} antialiased`}
+      >
+        <AuthProvider>{children}</AuthProvider>
+        <Toaster richColors position="top-right" />
+      </body>
     </html>
   );
 }
