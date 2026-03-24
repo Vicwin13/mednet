@@ -9,7 +9,7 @@ export interface Hospital {
   specialties: string[];
   extraCount: number;
   fee: string;
-  image: string;
+  image: string | any;
 }
 
 interface HospitalCardProps {

@@ -14,7 +14,7 @@ const hospitals: Hospital[] = [
         specialties: ["Cardiology", "Neurology"],
         extraCount: 3,
         fee: "120",
-        image: "https://images.unsplash.com/photo-1586773860418-d37222d8fce3?w=400&q=80",
+        image: "/images/hospital1.jpg",
     },
     {
         id: 2,
@@ -25,7 +25,7 @@ const hospitals: Hospital[] = [
         specialties: ["Pediatrics", "Surgery"],
         extraCount: 2,
         fee: "95",
-        image: "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=400&q=80",
+        image: "/images/hospital2.jpg",
     },
     {
         id: 3,
@@ -36,7 +36,7 @@ const hospitals: Hospital[] = [
         specialties: ["Cardiology", "Neurology"],
         extraCount: 5,
         fee: "150",
-        image: "https://images.unsplash.com/photo-1538108149393-fbbd81895907?w=400&q=80",
+        image: "/images/hospital3.jpg",
     },
     {
         id: 4,
@@ -47,7 +47,7 @@ const hospitals: Hospital[] = [
         specialties: ["General Surgery", "Pediatrics"],
         extraCount: 1,
         fee: "80",
-        image: "https://images.unsplash.com/photo-1587351021759-3e566b6af7cc?w=400&q=80",
+        image: "/images/hospital4.jpg",
     },
 ];
 
