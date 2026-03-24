@@ -14,7 +14,13 @@ export default function RoleToggle({ role, setRole }: RoleToggleProps) {
         className={`px-4 py-2 flex justify-center gap-2 items-center w-full rounded-md ${role === "patient" ? "shadow-md border-b-2 rounded border-(--main-color) font-semibold text-foreground" : " text-foreground"}`}
         onClick={() => setRole("patient")}
       >
-        <Image src="/patient.svg" alt="Patient Icon" width={24} height={24} />
+        <Image
+          src="/patient.svg"
+          loading="eager"
+          alt="Patient Icon"
+          width={24}
+          height={24}
+        />
         Patient
       </button>
       <button
