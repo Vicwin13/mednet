@@ -10,7 +10,7 @@ export default function SearchBar({
   onSearch,
 }: SearchBarProps) {
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-3 min-w-5xl">
       <div className="relative flex-1">
         <Search size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
         <input

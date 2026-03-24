@@ -1,14 +1,15 @@
 "use client";
 import { Bell, ChevronDown, User } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 
 const Header = () => {
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-100 flex items-center px-6 justify-between z-50">
       {/* Logo */}
-      <div className="flex items-center gap-2">
-        <Image src={"/logo.png"} alt="MedNet-logo" width={239} height={65} />
-      </div>
+      <Link href={"/dashboard/patient"} className="flex items-center gap-2">
+        <Image src={"/images/logo.png"} alt="MedNet-logo" width={239} height={65} />
+      </Link>
 
       {/* Right side */}
       <div className="flex items-center gap-4">
