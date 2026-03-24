@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
+import { Database } from "@/types/supabase";
 
-let supabaseInstance: ReturnType<typeof createClient> | null = null;
+let supabaseInstance: ReturnType<typeof createClient<Database>> | null = null;
 
 export function getSupabaseClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -15,6 +16,6 @@ export function getSupabaseClient() {
     return supabaseInstance;
   }
 
-  supabaseInstance = createClient(supabaseUrl, supabaseKey);
+  supabaseInstance = createClient<Database>(supabaseUrl, supabaseKey);
   return supabaseInstance;
 }

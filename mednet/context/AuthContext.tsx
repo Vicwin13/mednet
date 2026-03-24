@@ -57,7 +57,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .eq("id", userId)
       .single();
 
-    setProfile(data);
+    if (!data) return;
+    setProfile({
+      ...data,
+      role: data.role as "patient" | "hospital",
+      verified: data.verified ?? false,
+    });
   };
 
   const signIn = async (email: string, password: string) => {
