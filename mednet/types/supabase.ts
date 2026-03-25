@@ -120,30 +120,24 @@ export type Database = {
           booking_id: string | null
           created_at: string | null
           id: string
-          provider: string
           status: string
           transaction_ref: string | null
-          user_id: string | null
         }
         Insert: {
           amount: number
           booking_id?: string | null
           created_at?: string | null
           id?: string
-          provider?: string
-          status?: string
+          status: string
           transaction_ref?: string | null
-          user_id?: string | null
         }
         Update: {
           amount?: number
           booking_id?: string | null
           created_at?: string | null
           id?: string
-          provider?: string
           status?: string
           transaction_ref?: string | null
-          user_id?: string | null
         }
         Relationships: [
           {
@@ -151,48 +145,6 @@ export type Database = {
             columns: ["booking_id"]
             isOneToOne: false
             referencedRelation: "bookings"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "payments_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      payouts: {
-        Row: {
-          amount: number
-          created_at: string | null
-          hospital_id: string | null
-          id: string
-          reference: string | null
-          status: string | null
-        }
-        Insert: {
-          amount: number
-          created_at?: string | null
-          hospital_id?: string | null
-          id?: string
-          reference?: string | null
-          status?: string | null
-        }
-        Update: {
-          amount?: number
-          created_at?: string | null
-          hospital_id?: string | null
-          id?: string
-          reference?: string | null
-          status?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "payouts_hospital_id_fkey"
-            columns: ["hospital_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]
@@ -285,89 +237,6 @@ export type Database = {
             columns: ["hospital_id"]
             isOneToOne: false
             referencedRelation: "hospitals"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      transactions: {
-        Row: {
-          amount: number
-          created_at: string | null
-          hospital_id: string | null
-          id: string
-          patient_id: string | null
-          status: string | null
-        }
-        Insert: {
-          amount: number
-          created_at?: string | null
-          hospital_id?: string | null
-          id?: string
-          patient_id?: string | null
-          status?: string | null
-        }
-        Update: {
-          amount?: number
-          created_at?: string | null
-          hospital_id?: string | null
-          id?: string
-          patient_id?: string | null
-          status?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "transactions_hospital_id_fkey"
-            columns: ["hospital_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "transactions_patient_id_fkey"
-            columns: ["patient_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      wallets: {
-        Row: {
-          balance: number | null
-          created_at: string | null
-          currency: string | null
-          id: string
-          is_active: boolean | null
-          locked_balance: number | null
-          updated_at: string | null
-          user_id: string | null
-        }
-        Insert: {
-          balance?: number | null
-          created_at?: string | null
-          currency?: string | null
-          id?: string
-          is_active?: boolean | null
-          locked_balance?: number | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          balance?: number | null
-          created_at?: string | null
-          currency?: string | null
-          id?: string
-          is_active?: boolean | null
-          locked_balance?: number | null
-          updated_at?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "wallets_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

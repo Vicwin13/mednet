@@ -70,7 +70,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           return;
         }
 
-        if (!data) return;
+    if (!data) return;
+    setProfile({
+      ...data,
+      role: data.role as "patient" | "hospital",
+      verified: data.verified ?? false,
+    });
+  };
 
         setProfile({
           ...data,
