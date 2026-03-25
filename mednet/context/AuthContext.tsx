@@ -17,11 +17,11 @@ export type Profile = {
   firstname: string | null;
   lastname: string | null;
   hospitalname: string | null;
-  email: string | null;
   phone_number: string | null;
   dob: string | null;
   address: string | null;
-  nin: string | null;
+  nin: number | null;
+  cac: string | null;
   profile_image: string | null;
   verified: boolean;
 };

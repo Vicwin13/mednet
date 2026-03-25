@@ -1,13 +1,30 @@
 "use client";
 
-import { Bell, ChevronDown, User } from "lucide-react";
+import { Bell, ChevronDown, LogOut, User } from "lucide-react";
 
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { toast } from "sonner";
 
 const Header = () => {
-  const {profile} = useAuth();
+  const {profile, signOut} = useAuth();
+  const router = useRouter();
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      router.push("/auth");
+      toast.success("Signout successfully")
+    } catch (err) {
+      toast.warning("Technical error occured while signing out")
+      console.error("Sign out error:", err);
+    }
+  };
+
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-100 flex items-center px-6 justify-between z-50">
       {/* Logo */}
@@ -27,7 +44,9 @@ const Header = () => {
           <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-blue-600 rounded-full" />
         </button>
 
-        <button className="flex items-center gap-3 pl-2 pr-3 py-1.5 hover:bg-gray-50 rounded-lg transition-colors">
+        <button
+        onClick={() => setMenuOpen((prev) => !prev)}
+        className="flex items-center gap-3 pl-2 pr-3 py-1.5 hover:bg-gray-50 rounded-lg transition-colors">
           <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
             <User size={16} className="text-gray-600" />
           </div>
@@ -46,6 +65,17 @@ const Header = () => {
           </div>
           <ChevronDown size={16} className="text-gray-400" />
         </button>
+
+        {menuOpen && (
+        <div className="absolute right-6 top-16 mt-2 w-44 bg-white border border-gray-300 rounded-lg shadow-md z-50">
+          <button
+            onClick={handleSignOut}
+            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+          >
+            <LogOut size={16} /> Sign out
+          </button>
+        </div>
+      )}
       </div>
     </header>
   );

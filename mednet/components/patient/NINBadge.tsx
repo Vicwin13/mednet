@@ -1,7 +1,7 @@
 import { ShieldCheck, ShieldAlert, Loader2 } from "lucide-react";
 
 interface NINBadgeProps {
-    nin: string | null;
+    nin: number | null;
     isVerified: boolean;
     isVerifying: boolean;
     onVerify: () => void;
@@ -22,7 +22,7 @@ export default function NINBadge({
             <div className="flex items-center gap-3">
                 {/* Masked NIN value */}
                 <span className="text-sm font-semibold text-gray-800">
-                    {nin ? `${"•".repeat(7)}${nin.slice(-4)}` : "Not provided"}
+                    {nin ? `${"•".repeat(7)}${String(nin).slice(-4)}` : "Not provided"}
                 </span>
 
                 {/* Status badge */}

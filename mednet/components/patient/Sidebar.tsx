@@ -22,7 +22,7 @@ const patientNavItems = [
     label: "Wallet",
     href: "/dashboard/patient/hospitals/patient-wallet",
   },
-  { icon: Settings, label: "Settings", href: "" },
+  { icon: Settings, label: "Settings", href: "/dashboard/patient/settings" },
 ];
 
 const hospitalNavItems = [

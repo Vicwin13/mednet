@@ -6,7 +6,6 @@ import { getSupabaseClient } from "@/lib/supabase";
 import { Profile } from "@/context/AuthContext";
 import FormField from "./FormField";
 import NINField, {NINStatus} from "./NINField";
-
 interface EditModalProps {
     profile: Profile;
     userEmail: string | null | undefined;
@@ -40,7 +39,7 @@ export default function EditModal({
         phone_number: profile.phone_number ?? "",
         dob: profile.dob ?? "",
         address: profile.address ?? "",
-        nin: profile.nin ?? "",
+        nin: profile.nin ? String(profile.nin) : "",
     });
 
     const [ninStatus, setNINStatus] = useState<NINStatus>(
@@ -109,22 +108,22 @@ export default function EditModal({
             updates.firstname = form.firstname || null;
             updates.lastname = form.lastname || null;
             updates.dob = form.dob || null;
-            updates.nin = form.nin || null;
+            updates.nin = form.nin ? Number(form.nin) : null;
             updates.verified = ninStatus === "verified";
         } else {
             updates.hospitalname = form.hospitalname || null;
         }
 
-        // const { error } = await supabase
-        //     .from("profiles")
-        //     .update(updates)
-        //     .eq("id", profile.id);
+        const { error } = await supabase
+            .from("profiles")
+            .update(updates)
+            .eq("id", profile.id);
 
-        // if (error) {
-        //     setSaveError("Failed to save changes. Please try again.");
-        //     setSaving(false);
-        //     return;
-        // }
+        if (error) {
+            setSaveError("Failed to save changes. Please try again.");
+            setSaving(false);
+            return;
+        }
 
         onSaved(updates);
         setSaving(false);
