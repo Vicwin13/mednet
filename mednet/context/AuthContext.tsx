@@ -117,6 +117,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (error) throw error;
 
       const user = data.user;
+
       if (user && data.session) {
         // Profile is automatically created by the database trigger
         // Just fetch it after a short delay to ensure the trigger has fired
