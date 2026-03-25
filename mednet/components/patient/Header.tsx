@@ -1,5 +1,7 @@
 "use client";
+
 import { Bell, ChevronDown, User } from "lucide-react";
+
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
@@ -10,7 +12,12 @@ const Header = () => {
     <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-100 flex items-center px-6 justify-between z-50">
       {/* Logo */}
       <Link href={"/dashboard/patient"} className="flex items-center gap-2">
-        <Image src={"/images/logo.png"} alt="MedNet-logo" width={239} height={65} />
+        <Image
+          src={"/images/logo.png"}
+          alt="MedNet-logo"
+          width={239}
+          height={65}
+        />
       </Link>
 
       {/* Right side */}
@@ -25,14 +32,23 @@ const Header = () => {
             <User size={16} className="text-gray-600" />
           </div>
           <div className="text-left">
-            <p className="text-sm font-semibold text-gray-900 leading-tight">{profile?.firstname} {profile?.lastname}</p>
-            <p className="text-xs text-gray-500 leading-tight">{profile?.verified ? "Verified" : "Unverified"}</p>
+            <p className="text-sm font-semibold text-gray-900 leading-tight">
+              {profile?.firstname || profile?.hospitalname || "User"}{" "}
+              {profile?.lastname}
+            </p>
+            <p
+              className={`text-xs text-gray-500 leading-tight ${profile?.verified === false ? "text-red-500" : "text-green-600"}`}
+            >
+              {profile?.verified === false
+                ? "Unverified Personnel"
+                : "Verified Personnel"}
+            </p>
           </div>
           <ChevronDown size={16} className="text-gray-400" />
         </button>
       </div>
     </header>
   );
-}
+};
 
-export default Header
+export default Header;

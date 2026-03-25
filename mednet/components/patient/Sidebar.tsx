@@ -1,16 +1,52 @@
 "use client";
-import { LayoutDashboard, Building2, CalendarDays, Settings } from "lucide-react";
+
+import {
+  Building2,
+  CalendarDays,
+  ClipboardList,
+  LayoutDashboard,
+  Settings,
+  Users,
+  Wallet,
+} from "lucide-react";
+
+import { useAuth } from "@/context/AuthContext";
 import { usePathname } from "next/navigation";
 
-const navItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "#" },
+const patientNavItems = [
+  { icon: LayoutDashboard, label: "Dashboard", href: "" },
   { icon: Building2, label: "Hospitals", href: "/dashboard/patient" },
-  { icon: CalendarDays, label: "Appointments", href: "#" },
-  { icon: Settings, label: "Settings", href: "/dashboard/patient/settings" },
+  { icon: CalendarDays, label: "Appointments", href: "" },
+  {
+    icon: Wallet,
+    label: "Wallet",
+    href: "/dashboard/patient/hospitals/patient-wallet",
+  },
+  { icon: Settings, label: "Settings", href: "" },
+];
+
+const hospitalNavItems = [
+  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/hospital" },
+  { icon: Users, label: "Staffs", href: "/dashboard/hospital/staffs" },
+  {
+    icon: ClipboardList,
+    label: "Requests",
+    href: "/dashboard/hospital/requests",
+  },
+  {
+    icon: Wallet,
+    label: "Wallet",
+    href: "/dashboard/hospital/hospital-wallet",
+  },
+  { icon: Settings, label: "Settings", href: "/dashboard/hospital" },
 ];
 
 export default function Sidebar() {
+  const { profile } = useAuth();
   const pathname = usePathname();
+
+  const navItems =
+    profile?.role === "hospital" ? hospitalNavItems : patientNavItems;
 
   return (
     <aside className="fixed top-16 left-0 w-52 h-[calc(100vh-64px)] bg-white border-r border-gray-100 flex flex-col py-4 z-10">
