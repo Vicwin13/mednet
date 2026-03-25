@@ -11,14 +11,21 @@ import {
 
 import { getSupabaseClient } from "../lib/supabase";
 
-type Profile = {
+export type Profile = {
   id: string;
   role: "patient" | "hospital";
   firstname: string | null;
   lastname: string | null;
   hospitalname: string | null;
+  phone_number: string | null;
+  dob: string | null;
+  address: string | null;
+  nin: number | null;
+  cac: string | null;
+  profile_image: string | null;
   verified: boolean;
 };
+
 type AuthContextType = {
   user: User | null;
   session: Session | null;
@@ -43,9 +50,9 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   profile: null,
   loading: true,
-  signIn: async () => {},
-  signUp: async () => {},
-  signOut: async () => {},
+  signIn: async () => { },
+  signUp: async () => { },
+  signOut: async () => { },
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
