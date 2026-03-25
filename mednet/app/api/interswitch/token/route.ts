@@ -2,6 +2,7 @@ import { getAccessToken, getMerchantCode } from "@/lib/interswitchToken";
 
 import { NextResponse } from "next/server";
 
+
 export async function GET() {
   try {
     const token = await getAccessToken();

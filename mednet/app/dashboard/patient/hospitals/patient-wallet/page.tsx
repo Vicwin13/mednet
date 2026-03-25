@@ -55,5 +55,12 @@ export default function PatientWallet() {
         />
       </>
     </AuthProtected>
+  if (!wallet) <p>Loading ...</p>;
+
+  return (
+    <>
+      <p>Wallet Address</p>
+      {wallet?.balance}
+    </>
   );
 }
