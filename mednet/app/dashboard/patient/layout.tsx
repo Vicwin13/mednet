@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
 import Header from "../../../components/patient/Header";
+import type { Metadata } from "next";
 import Sidebar from "../../../components/patient/Sidebar";
 
 export const metadata: Metadata = {
