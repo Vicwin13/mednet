@@ -20,5 +20,10 @@ export default function PatientWallet() {
 
   if (!wallet) <p>Loading ...</p>;
 
-  return <>{wallet?.balance}</>;
+  return (
+    <>
+      <p>Wallet Address</p>
+      {wallet?.balance}
+    </>
+  );
 }
