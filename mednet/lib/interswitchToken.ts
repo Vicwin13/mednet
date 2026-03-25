@@ -12,8 +12,6 @@ export async function getAccessToken() {
   if (accessToken && expiryTime && now < expiryTime) {
     return accessToken;
     }
-    
-
 
   const res = await fetch("https://apps.qa.interswitchng.com/passport/oauth/token", {
     method: "POST",

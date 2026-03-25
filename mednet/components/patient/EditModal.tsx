@@ -6,6 +6,7 @@ import { getSupabaseClient } from "@/lib/supabase";
 import { Profile } from "@/context/AuthContext";
 import FormField from "./FormField";
 import NINField, {NINStatus} from "./NINField";
+import { toast } from "sonner";
 interface EditModalProps {
     profile: Profile;
     userEmail: string | null | undefined;
@@ -66,13 +67,11 @@ export default function EditModal({
         setNINStatus("verifying");
         setNINError(null);
         try {
-            const res = await fetch(
-                "https://api-marketplace-routing.k8.isw.la/marketplace-routing/api/v1/verify/identity/nin",
+            const res = await fetch("/api/nin-verification",
                 {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${process.env.NEXT_PUBLIC_ISW_TOKEN}`,
                     },
                     body: JSON.stringify({
                         firstName: form.firstname,
@@ -82,14 +81,19 @@ export default function EditModal({
                 }
             );
 
+            const data = await res.json();
+
             if (res.ok) {
                 setNINStatus("verified");
+                toast.success("NIN verification was successful")
             } else {
                 setNINStatus("failed");
+                toast.error("NIN Verification failed. Please try again!")
                 setNINError("NIN could not be verified. Please check the number and try again.");
             }
         } catch {
             setNINStatus("failed");
+            toast.error("Verification failed. Please check your connection.");
             setNINError("Verification failed. Please check your connection.");
         }
     }
