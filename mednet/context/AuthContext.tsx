@@ -116,6 +116,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
       if (error) throw error;
 
+      if (data.user && data.user.identities?.length === 0) {
+        throw new Error("An account with this email already exists.");
+      }
+
       const user = data.user;
 
       if (user && data.session) {

@@ -47,6 +47,12 @@ export default function PatientWallet() {
           >
             <CirclePlus /> Fund Wallet
           </button>
+          <button
+            onClick={() => setIsFundModalOpen(true)}
+            className="flex items-center justify-center gap-2 rounded-md hover:bg-amber-50 cursor-pointer bg-white text-blue-600 font-bold  py-2.5 px-3"
+          >
+            <CirclePlus /> Fund Wallet
+          </button>
         </div>
         <FundWalletModal
           isOpen={isFundModalOpen}

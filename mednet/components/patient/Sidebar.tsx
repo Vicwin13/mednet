@@ -20,25 +20,25 @@ const patientNavItems = [
   {
     icon: Wallet,
     label: "Wallet",
-    href: "/dashboard/patient/hospitals/patient-wallet",
+    href: "/dashboard/wallet",
   },
   { icon: Settings, label: "Settings", href: "" },
 ];
 
 const hospitalNavItems = [
-  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard/hospital" },
+  { icon: LayoutDashboard, label: "Dashboard", href: "/dashboard" },
   { icon: Users, label: "Staffs", href: "/dashboard/hospital/staffs" },
   {
     icon: ClipboardList,
     label: "Requests",
-    href: "/dashboard/hospital/requests",
+    href: "/dashboard/hospital",
   },
   {
     icon: Wallet,
     label: "Wallet",
-    href: "/dashboard/hospital/hospital-wallet",
+    href: "/dashboard/wallet",
   },
-  { icon: Settings, label: "Settings", href: "/dashboard/hospital" },
+  { icon: Settings, label: "Settings", href: "/dashboard/" },
 ];
 
 export default function Sidebar() {

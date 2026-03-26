@@ -1,22 +1,17 @@
-import Link from "next/link";
-import React from "react";
+"use client";
 
-export default function Hospital() {
+export default function Requests() {
   return (
-    <div>
-      Hospital
-      <Link
-        href={"/dashboard/hospital/requests"}
-        className="bg-[#bbb] cursor-pointer p-3 inline-block"
-      >
-        Request
-      </Link>
-      <Link
-        href={"/dashboard/hospital/staffs"}
-        className="bg-[#bbb] cursor-pointer p-3 inline-block"
-      >
-        Staffs
-      </Link>
+    <div className="p-6">
+      <h1 className="text-3xl font-bold mb-2">Consultant Requests</h1>
+      <p className="text-gray-600 mb-8">
+        Manage new patient inquiries and assign specialists.
+      </p>
+
+      {/* Empty state - to be populated later */}
+      <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
+        <p className="text-gray-500">No requests yet</p>
+      </div>
     </div>
   );
 }

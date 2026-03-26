@@ -26,7 +26,7 @@ export default function FundWalletModal({
   const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
-  const { session } = useAuth();
+  const { session, profile } = useAuth();
 
   // Load Interswitch inline checkout script
   useEffect(() => {
@@ -164,6 +164,54 @@ export default function FundWalletModal({
         </div>
 
         <div className="space-y-4">
+          <div>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              value={session?.user.email || ""}
+              readOnly
+              className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="firstname"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              First Name
+            </label>
+            <input
+              type="text"
+              id="firstname"
+              value={profile?.firstname || ""}
+              readOnly
+              className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600 focus:outline-none"
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="lastname"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Last Name
+            </label>
+            <input
+              type="text"
+              id="lastname"
+              value={profile?.lastname || ""}
+              readOnly
+              className="w-full px-4 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600 focus:outline-none"
+            />
+          </div>
+
           <div>
             <label
               htmlFor="amount"

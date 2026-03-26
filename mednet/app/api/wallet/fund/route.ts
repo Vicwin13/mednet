@@ -24,8 +24,37 @@ interface InterswitchTransactionResponse {
 
 export async function POST(request: Request) {
   try {
+    // Authenticate user
+    const supabase = getSupabaseClient();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Get user's profile to verify role
+    const { data: profile, error: profileError } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (profileError || !profile) {
+      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
+    }
+
+    // Only patients can fund wallets
+    if (profile.role !== "patient") {
+      return NextResponse.json({ error: "Forbidden: Only patients can fund wallets" }, { status: 403 });
+    }
+
     const body: FundWalletRequest = await request.json();
     const { userId, amount, txnRef, response } = body;
+
+    // Security: Ensure user can only fund their own wallet
+    if (userId !== user.id) {
+      return NextResponse.json({ error: "Forbidden: Can only fund your own wallet" }, { status: 403 });
+    }
 
     if (!userId || !amount || !txnRef) {
       return NextResponse.json(
@@ -33,8 +62,6 @@ export async function POST(request: Request) {
         { status: 400 }
       );
     }
-
-    const supabase = getSupabaseClient();
 
     // 1. Verify the transaction with Interswitch using the correct endpoint
     const merchantCode = getMerchantCode();
