@@ -59,7 +59,7 @@ const Header = () => {
             <p
               className={`text-xs text-gray-500 leading-tight ${profile?.verified === false ? "text-red-500" : "text-green-600"}`}
             >
-              {profile?.verified === false
+              {profile?.role === "patient" && profile?.verified === false
                 ? "Unverified Personnel"
                 : "Verified Personnel"}
             </p>
