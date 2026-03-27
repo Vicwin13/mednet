@@ -187,12 +187,15 @@ When a patient enters their NIN, MedNet sends it to the **Interswitch Identity V
 
 **Victor Nwimo**
 vnwimo13@gmail.com
+Frontend Developer: Worked on creating the supabase, the hospital UI and transactions on the app
 
 **Gerlad Nnaji Chibuzor**
 Geraldnnaji55@gmail.com
+Designer: Work on creating the designs and the work flow of the project
 
 **Fatima Oyiza Jimoh**
 fatimaoyiza18@gmail.com
+Frontend Developer: Worked on the UI also, the patients UI, authentication and others.
 
 ---
 
