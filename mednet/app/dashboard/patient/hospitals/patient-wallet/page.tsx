@@ -83,7 +83,7 @@ export default function PatientWallet() {
   return (
     <AuthProtected allowedRoles={["patient"]} redirectTo="/">
       <>
-        <div className="bg-blue-600 px-10 py-4 w-sm m-3 rounded-xl text-white ">
+        <div className="bg-blue-600 px-10 py-4 w-md m-3 rounded-xl text-white ">
           <h1 className="text-lg font-light mb-4 uppercase">Current Balance</h1>
           <p className="text-white font-bold text-4xl pb-8">
             {" "}
@@ -107,7 +107,7 @@ export default function PatientWallet() {
         </div>
 
         {/* Transaction History */}
-        <TransactionHistory transactions={transactions} />
+        <TransactionHistory transactions={transactions} userRole="patient" />
 
         <FundWalletModal
           isOpen={isFundModalOpen}

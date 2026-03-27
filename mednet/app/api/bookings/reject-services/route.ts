@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { recordPatientRefund } from '@/lib/mednetWalletService';
 import { refundLedgerEntry } from '@/lib/ledgerService';
 
 export async function POST(request: Request) {
@@ -52,6 +53,14 @@ export async function POST(request: Request) {
         { error: 'Transaction not found' },
         { status: 404 }
       );
+    }
+
+    // Debit mednet-wallet (money OUT from Mednet back to patient)
+    try {
+      await recordPatientRefund(booking.fee || 0, `REFUND_${bookingId}`);
+    } catch (mednetError) {
+      console.error('Error debiting mednet-wallet for refund:', mednetError);
+      // Continue even if mednet-wallet fails - refund still valid
     }
 
     // Refund patient wallet via ledger

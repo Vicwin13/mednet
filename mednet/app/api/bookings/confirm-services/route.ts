@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { recordHospitalPayment } from '@/lib/mednetWalletService';
 
-interface ConfirmServicesRequest {
-  bookingId: string;
-}
+// interface ConfirmServicesRequest {
+//   bookingId: string;
+// }
 
 export async function POST(request: Request) {
   try {
@@ -62,7 +63,15 @@ export async function POST(request: Request) {
 
     const amount = booking.fee || 0;
 
-    // 4. Credit hospital wallet
+    // 4. Debit mednet-wallet (money OUT from Mednet to hospital)
+    try {
+      await recordHospitalPayment(amount, `SERVICE_${bookingId}`, booking.hospital_id);
+    } catch (mednetError) {
+      console.error('Error debiting mednet-wallet:', mednetError);
+      // Continue even if mednet-wallet fails - payment still valid
+    }
+
+    // 5. Credit hospital wallet
     await supabase
       .from('wallets')
       .update({ balance: Number(hospitalWallet.balance) + amount })

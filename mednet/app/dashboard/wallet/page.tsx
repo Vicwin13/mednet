@@ -109,7 +109,7 @@ export default function WalletPage() {
           onWithdrawClick={() => setIsWithdrawModalOpen(true)}
         />
 
-        <TransactionHistory transactions={transactions} />
+        <TransactionHistory transactions={transactions} userRole={userRole} />
       </div>
 
       {/* Patient: Simulate Modal */}

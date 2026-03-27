@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { recordPatientRefund } from '@/lib/mednetWalletService';
 
 interface RejectRequestRequest {
   bookingId: string;
@@ -62,7 +63,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // 4. Refund patient wallet
+    // 4. Debit mednet-wallet (money OUT from Mednet back to patient)
+    try {
+      await recordPatientRefund(amount, `REJECT_${bookingId}`);
+    } catch (mednetError) {
+      console.error('Error debiting mednet-wallet for refund:', mednetError);
+      // Continue even if mednet-wallet fails - refund still valid
+    }
+
+    // 5. Refund patient wallet
     await supabase
       .from('wallets')
       .update({ balance: Number(patientWallet.balance) + amount })
@@ -76,7 +85,7 @@ export async function POST(request: Request) {
         .eq('id', booking.transactions[0].id);
     }
 
-    // 6. Create ledger entry for refund
+    // 6. Create ledger entry for refund (in wallet_transactions table for patient)
     await supabase
       .from('wallet_transactions')
       .insert({
