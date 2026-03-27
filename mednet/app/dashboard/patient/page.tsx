@@ -1,38 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
 import AuthProtected from "@/components/AuthProtected";
 import FilterBar from "@/components/patient/Filterbar";
 import { Hospital } from "@/app/data/hospitals";
 import HospitalCard from "@/components/patient/HospitalCard";
 import SearchBar from "@/components/patient/Searchbar";
+import { hospitals } from "@/app/data/hospitals";
+import { useState } from "react";
 
 export default function HospitalsPage() {
   const [activeSpecialty, setActiveSpecialty] = useState("All");
-  const [hospitals, setHospitals] = useState<Hospital[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchHospitals = async () => {
-      try {
-        setLoading(true);
-        const response = await fetch("/api/hospitals");
-        if (!response.ok) {
-          throw new Error("Failed to fetch hospitals");
-        }
-        const data = await response.json();
-        console.log("Fetched Hospitals:", data);
-        setHospitals(data);
-      } catch (error) {
-        console.error("Error fetching hospitals:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchHospitals();
-  }, []);
 
   const filtered =
     activeSpecialty === "All"
@@ -68,11 +45,7 @@ export default function HospitalsPage() {
         </div>
 
         <div className="flex flex-col gap-4">
-          {loading ? (
-            <div className="text-center py-16 text-gray-400">
-              <p className="text-lg font-medium">Loading hospitals...</p>
-            </div>
-          ) : filtered.length > 0 ? (
+          {filtered.length > 0 ? (
             filtered.map((hospital) => (
               <HospitalCard key={hospital.id} hospital={hospital} />
             ))
