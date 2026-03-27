@@ -27,7 +27,7 @@ const timeSlots: string[] = ["09:00 AM", "02:00 PM", "11:30 AM", "04:30 PM"];
 type BookingStatus =
   | "none"
   | "pending"
-  | "accepted"
+  | "accepted"       
   | "assigned"
   | "rejected"
   | "completed";
@@ -384,7 +384,10 @@ export default function HospitalDetailPage() {
           {/* CTA - Button changes based on booking status */}
           {bookingStatus === "none" && (
             <button
-              onClick={handleConfirmPayment}
+              onClick={() => {
+                console.log('[DEBUG CLIENT] Button clicked!');
+                handleConfirmPayment();
+              }}
               disabled={isProcessing}
               className="w-full flex items-center justify-center gap-2 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors text-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
             >

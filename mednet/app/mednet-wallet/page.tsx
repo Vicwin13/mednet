@@ -4,12 +4,13 @@ import { RefreshCw, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Database } from "@/types/supabase";
-import { useAuth } from "@/context/AuthContext";
+
+// import { useAuth } from "@/context/AuthContext";
 
 type Ledger = Database["public"]["Tables"]["ledger"]["Row"];
 
 export default function MednetWallet() {
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const [balance, setBalance] = useState<number>(0);
   const [ledgerEntries, setLedgerEntries] = useState<Ledger[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,18 +37,13 @@ export default function MednetWallet() {
       }
 
       // Load Mednet ledger entries from API
-      console.log('[DEBUG CLIENT] MednetWallet page: Fetching ledger entries...');
       const ledgerResponse = await fetch("/api/mednet-wallet/ledger?limit=50");
-      console.log('[DEBUG CLIENT] MednetWallet page: Ledger response:', ledgerResponse.status, ledgerResponse.ok);
       if (ledgerResponse.ok) {
         const ledgerData = await ledgerResponse.json();
-        console.log('[DEBUG CLIENT] MednetWallet page: Ledger data:', ledgerData);
         setLedgerEntries(ledgerData.entries || []);
       }
     } catch (error) {
-      console.error("[DEBUG CLIENT] MednetWallet page: Error loading Mednet wallet data:", error);
     } finally {
-      console.log('[DEBUG CLIENT] MednetWallet page: Loading complete');
       setLoading(false);
     }
   };
@@ -89,7 +85,7 @@ export default function MednetWallet() {
       </div>
 
       {/* Wallet Balance Card */}
-      <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-8 mb-8 text-white shadow-lg">
+      <div className="bg-linear-to-br from-blue-600 to-blue-700 rounded-2xl p-8 mb-8 text-white shadow-lg">
         <div className="flex items-center gap-3 mb-4">
           <Wallet size={32} className="opacity-80" />
           <h2 className="text-lg font-medium opacity-90">Current Balance</h2>

@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { recordHospitalPayment } from '@/lib/mednetWalletService';
 
-interface ConfirmServicesRequest {
-  bookingId: string;
-}
+// interface ConfirmServicesRequest {
+//   bookingId: string;
+// }
 
 export async function POST(request: Request) {
   try {

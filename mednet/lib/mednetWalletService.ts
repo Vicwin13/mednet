@@ -257,7 +257,6 @@ export async function recordPatientRefund(amount: number, transactionId: string)
 
   // Handle PGRST116 error (table is empty) - create wallet first
   if (fetchError && fetchError.code === 'PGRST116') {
-    console.log('[DEBUG] recordPatientRefund: Table is empty, creating new wallet...');
     
     const { error: insertError } = await supabase
       .from('mednet_wallets')
