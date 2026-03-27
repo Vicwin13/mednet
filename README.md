@@ -20,7 +20,7 @@ There are two types of users:
 
 ## Live Demo
 
-🔗 [https://mednet-p5ctp1ot8-vicwin13s-projects.vercel.app/](https://mednet-p5ctp1ot8-vicwin13s-projects.vercel.app/)
+🔗 [https://mednet-delta.vercel.app/](https://mednet-delta.vercel.app/)
 
 ### Test Accounts
 
@@ -200,5 +200,5 @@ Frontend Developer: Worked on the UI also, the patients UI, authentication and o
 ---
 
 <div align="center">
-  <sub><a href="https://mednet-p5ctp1ot8-vicwin13s-projects.vercel.app/">MedNet</a></sub>
+  <sub><a href="https://mednet-delta.vercel.app/">MedNet</a></sub>
 </div>
