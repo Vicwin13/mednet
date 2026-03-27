@@ -46,7 +46,7 @@ const Header = () => {
 
         <button
           onClick={() => setMenuOpen((prev) => !prev)}
-          className="flex items-center gap-3 pl-2 pr-3 py-1.5 hover:bg-gray-50 rounded-lg transition-colors"
+          className="flex items-center gap-3 pl-2 pr-3 py-1.5 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
         >
           <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
             <User size={16} className="text-gray-600" />
