@@ -16,34 +16,44 @@ export default function MednetWallet() {
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
+    console.log('[DEBUG CLIENT] MednetWallet page: Component mounted, loading data...');
     loadWalletData();
   }, []);
 
   const loadWalletData = async () => {
+    console.log('[DEBUG CLIENT] MednetWallet page: loadWalletData called');
     try {
       setLoading(true);
 
       // Load Mednet wallet balance from API
+      console.log('[DEBUG CLIENT] MednetWallet page: Fetching balance...');
       const balanceResponse = await fetch("/api/mednet-wallet/balance");
+      console.log('[DEBUG CLIENT] MednetWallet page: Balance response:', balanceResponse.status, balanceResponse.ok);
       if (balanceResponse.ok) {
         const balanceData = await balanceResponse.json();
+        console.log('[DEBUG CLIENT] MednetWallet page: Balance data:', balanceData);
         setBalance(balanceData.balance || 0);
       }
 
       // Load Mednet ledger entries from API
+      console.log('[DEBUG CLIENT] MednetWallet page: Fetching ledger entries...');
       const ledgerResponse = await fetch("/api/mednet-wallet/ledger?limit=50");
+      console.log('[DEBUG CLIENT] MednetWallet page: Ledger response:', ledgerResponse.status, ledgerResponse.ok);
       if (ledgerResponse.ok) {
         const ledgerData = await ledgerResponse.json();
+        console.log('[DEBUG CLIENT] MednetWallet page: Ledger data:', ledgerData);
         setLedgerEntries(ledgerData.entries || []);
       }
     } catch (error) {
-      console.error("Error loading Mednet wallet data:", error);
+      console.error("[DEBUG CLIENT] MednetWallet page: Error loading Mednet wallet data:", error);
     } finally {
+      console.log('[DEBUG CLIENT] MednetWallet page: Loading complete');
       setLoading(false);
     }
   };
 
   const handleRefresh = async () => {
+    console.log('[DEBUG CLIENT] MednetWallet page: Refresh button clicked');
     setRefreshing(true);
     await loadWalletData();
     setRefreshing(false);

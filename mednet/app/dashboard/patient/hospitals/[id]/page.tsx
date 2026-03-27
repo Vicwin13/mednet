@@ -82,15 +82,22 @@ export default function HospitalDetailPage() {
   }, [id]);
 
   const handleConfirmPayment = async () => {
+    console.log('[DEBUG CLIENT] handleConfirmPayment called');
+    console.log('[DEBUG CLIENT] selectedDate:', selectedDate);
+    console.log('[DEBUG CLIENT] bookingStatus:', bookingStatus);
+    
     if (!selectedDate) {
+      console.log('[DEBUG CLIENT] No date selected, returning error');
       setError("Please select a preferred date");
       return;
     }
 
     try {
+      console.log('[DEBUG CLIENT] Starting booking process...');
       setIsProcessing(true);
       setError(null);
 
+      console.log('[DEBUG CLIENT] About to fetch /api/bookings/create-booking');
       const response = await fetch("/api/bookings/create-booking", {
         method: "POST",
         headers: {
@@ -106,13 +113,15 @@ export default function HospitalDetailPage() {
         }),
       });
 
+      console.log('[DEBUG CLIENT] Response received:', response.status, response.ok);
       if (!response.ok) {
         const errorData = await response.json();
-        console.log("booking Error:", errorData);
+        console.log("[DEBUG CLIENT] booking Error:", errorData);
         throw new Error(errorData.error || "Failed to create booking");
       }
 
       const data = await response.json();
+      console.log('[DEBUG CLIENT] Booking successful:', data);
       setBookingStatus("pending");
       setTransactionRef(data.transactionRef);
 
@@ -124,11 +133,12 @@ export default function HospitalDetailPage() {
       });
       setModalOpen(true);
     } catch (err) {
-      console.error("Error confirming payment:", err);
+      console.error("[DEBUG CLIENT] Error confirming payment:", err);
       setError(
         err instanceof Error ? err.message : "Failed to confirm payment",
       );
     } finally {
+      console.log('[DEBUG CLIENT] Setting isProcessing to false');
       setIsProcessing(false);
     }
   };

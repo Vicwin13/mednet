@@ -7,10 +7,34 @@ type WalletTransaction =
 
 interface TransactionHistoryProps {
   transactions: WalletTransaction[];
+  userRole?: "patient" | "hospital";
+}
+
+// Helper function to determine if a transaction should be displayed as positive
+function isPositiveTransaction(transactionType: string | null, userRole: "patient" | "hospital"): boolean {
+  if (!transactionType) return false;
+
+  // Patient wallet: positive transactions are those that add money to patient's wallet
+  if (userRole === "patient") {
+    return transactionType === "funding" ||
+           transactionType === "booking_receipt" ||
+           transactionType === "simulation";
+  }
+
+  // Hospital wallet: positive transactions are those that add money to hospital's wallet
+  if (userRole === "hospital") {
+    return transactionType === "service_payment" ||
+           transactionType === "booking_receipt" ||
+           transactionType === "funding" ||
+           transactionType === "simulation";
+  }
+
+  return false;
 }
 
 export default function TransactionHistory({
   transactions,
+  userRole = "patient",
 }: TransactionHistoryProps) {
   if (!transactions || transactions.length === 0) {
     return (
@@ -45,13 +69,9 @@ export default function TransactionHistory({
             </div>
             <div className="text-right">
               <p
-                className={`font-bold ${tx.transaction_type === "funding" || tx.transaction_type === "booking_receipt" || tx.transaction_type === "simulation" ? "text-green-600" : "text-red-600"}`}
+                className={`font-bold ${isPositiveTransaction(tx.transaction_type, userRole) ? "text-green-600" : "text-red-600"}`}
               >
-                {tx.transaction_type === "funding" ||
-                tx.transaction_type === "booking_receipt" ||
-                tx.transaction_type === "simulation"
-                  ? "+"
-                  : "-"}
+                {isPositiveTransaction(tx.transaction_type, userRole) ? "+" : "-"}
                 {tx.amount.toFixed(2)}
               </p>
               <p

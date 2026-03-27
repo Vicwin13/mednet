@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { recordPatientFunding } from '@/lib/mednetWalletService';
 
 export async function POST(request: Request) {
   try {
@@ -44,6 +45,16 @@ export async function POST(request: Request) {
       .from('wallets')
       .update({ balance: Number(wallet.balance) - amount })
       .eq('user_id', patientId);
+
+    // 2.5. Credit mednet-wallet (money IN to Mednet)
+    console.log('[DEBUG] Booking: About to credit mednet-wallet with amount:', amount);
+    try {
+      await recordPatientFunding(amount, `BOOKING_${Date.now()}`);
+      console.log('[DEBUG] Booking: Successfully credited mednet-wallet');
+    } catch (mednetError) {
+      console.error('[DEBUG] Booking: Error crediting mednet-wallet:', mednetError);
+      // Continue even if mednet-wallet fails - booking still valid
+    }
 
     // 3. Create transaction record
     const { data: transaction, error: transactionError } = await supabase
