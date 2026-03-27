@@ -1,6 +1,9 @@
 "use client";
 
-import { X } from "lucide-react";
+import { Loader2, X } from "lucide-react";
+
+import { toast } from "sonner";
+import { useAuth } from "@/context/AuthContext";
 import { useState } from "react";
 
 interface WithdrawWalletModalProps {
@@ -17,31 +20,59 @@ export default function WithdrawWalletModal({
   const [amount, setAmount] = useState("");
   const [bankAccount, setBankAccount] = useState("");
   const [loading, setLoading] = useState(false);
-
-  if (!isOpen) return null;
+  const { user } = useAuth();
 
   const handleWithdraw = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!amount || isNaN(Number(amount)) || Number(amount) < 1000) {
+      toast.error("Minimum withdrawal is ₦1,000");
+      return;
+    }
+
+    if (!user?.id) {
+      toast.error("Please log in to withdraw");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      // TODO: Implement withdrawal logic
-      // This would call an API route to process the withdrawal
-      console.log("Withdrawal request:", { amount, bankAccount });
+      const response = await fetch("/api/wallet/withdraw", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          amount: Number(amount),
+          bankAccountId: bankAccount,
+        }),
+      });
 
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1500));
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to process withdrawal");
+      }
 
+      toast.success("Withdrawal request submitted successfully!");
       onWithdrawSuccess();
       onClose();
       setAmount("");
       setBankAccount("");
     } catch (error) {
       console.error("Withdrawal error:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to process withdrawal. Please try again.",
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
@@ -84,7 +115,6 @@ export default function WithdrawWalletModal({
             >
               <option value="">Select bank account</option>
               <option value="acc1">GTBank - 01234567890 - John Doe</option>
-              {/* TODO: Load user's bank accounts from API */}
             </select>
           </div>
 
@@ -106,10 +136,17 @@ export default function WithdrawWalletModal({
             </button>
             <button
               type="submit"
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400"
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 flex items-center justify-center gap-2"
               disabled={loading}
             >
-              {loading ? "Processing..." : "Withdraw"}
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin" size={16} />
+                  Processing...
+                </>
+              ) : (
+                "Withdraw"
+              )}
             </button>
           </div>
         </form>

@@ -1,8 +1,11 @@
 "use client";
 
 import {
+  AlertCircle,
   BadgeCheck,
   BedDouble,
+  CheckCircle,
+  Clock,
   Heart,
   Info,
   MapPin,
@@ -11,16 +14,27 @@ import {
   Star,
   Wallet,
 } from "lucide-react";
+import ConfirmModal, { ModalType } from "@/components/ui/ConfirmModal";
 import { useEffect, useState } from "react";
 
 import { Hospital } from "@/app/data/hospitals";
 import Image from "next/image";
+import { useAuth } from "@/context/AuthContext";
 import { useParams } from "next/navigation";
 
 const timeSlots: string[] = ["09:00 AM", "02:00 PM", "11:30 AM", "04:30 PM"];
 
+type BookingStatus =
+  | "none"
+  | "pending"
+  | "accepted"
+  | "assigned"
+  | "rejected"
+  | "completed";
+
 export default function HospitalDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const { user } = useAuth();
 
   const [hospital, setHospital] = useState<Hospital | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,6 +42,19 @@ export default function HospitalDetailPage() {
   const [selectedTime, setSelectedTime] = useState<string>("09:00 AM");
   const [medicalHistory, setMedicalHistory] = useState<string>("");
   const [saved, setSaved] = useState<boolean>(false);
+  const [bookingStatus, setBookingStatus] = useState<BookingStatus>("none");
+  const [transactionRef, setTransactionRef] = useState<string>("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  // Modal state
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalConfig, setModalConfig] = useState<{
+    type: ModalType;
+    title: string;
+    message: string;
+    onConfirm?: () => void;
+  } | null>(null);
 
   useEffect(() => {
     const fetchHospital = async () => {
@@ -36,6 +63,7 @@ export default function HospitalDetailPage() {
       try {
         setLoading(true);
         const response = await fetch(`/api/hospitals/${id}`);
+
         if (!response.ok) {
           const errorData = await response.json();
           console.log("Real Error:", errorData);
@@ -52,6 +80,105 @@ export default function HospitalDetailPage() {
 
     fetchHospital();
   }, [id]);
+
+  const handleConfirmPayment = async () => {
+    if (!selectedDate) {
+      setError("Please select a preferred date");
+      return;
+    }
+
+    try {
+      setIsProcessing(true);
+      setError(null);
+
+      const response = await fetch("/api/bookings/create-booking", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          patientId: user?.id,
+          hospitalId: id,
+          amount: total,
+          preferredDate: selectedDate,
+          preferredTime: selectedTime,
+          medicalHistory: medicalHistory,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.log("booking Error:", errorData);
+        throw new Error(errorData.error || "Failed to create booking");
+      }
+
+      const data = await response.json();
+      setBookingStatus("pending");
+      setTransactionRef(data.transactionRef);
+
+      // Show success message
+      setModalConfig({
+        type: "success",
+        title: "Payment Confirmed",
+        message: `Payment confirmed! Transaction Reference: ${data.transactionRef}`,
+      });
+      setModalOpen(true);
+    } catch (err) {
+      console.error("Error confirming payment:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to confirm payment",
+      );
+    } finally {
+      setIsProcessing(false);
+    }
+  };
+
+  const handleConfirmServices = async () => {
+    setModalConfig({
+      type: "confirm",
+      title: "Confirm Services",
+      message:
+        "Are you sure you want to confirm that services have been rendered? This will release payment to the hospital.",
+      onConfirm: async () => {
+        try {
+          setIsProcessing(true);
+          setError(null);
+
+          const response = await fetch("/api/bookings/confirm-services", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              bookingId: transactionRef, // Using transactionRef as bookingId for now
+            }),
+          });
+
+          if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || "Failed to confirm services");
+          }
+
+          setBookingStatus("completed");
+          setModalConfig({
+            type: "success",
+            title: "Services Confirmed",
+            message:
+              "Services confirmed! Payment has been released to the hospital.",
+          });
+          setModalOpen(true);
+        } catch (err) {
+          console.error("Error confirming services:", err);
+          setError(
+            err instanceof Error ? err.message : "Failed to confirm services",
+          );
+        } finally {
+          setIsProcessing(false);
+        }
+      },
+    });
+    setModalOpen(true);
+  };
 
   if (loading) {
     return (
@@ -231,11 +358,99 @@ export default function HospitalDetailPage() {
             </div>
           </div>
 
-          {/* CTA */}
-          <button className="w-full flex items-center justify-center gap-2 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors text-sm">
-            <Wallet size={18} />
-            Confirm & proceed to payment
-          </button>
+          {/* Error message */}
+          {error && (
+            <div className="mb-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p className="text-red-600">{error}</p>
+              <button
+                onClick={() => setError(null)}
+                className="mt-2 text-sm text-red-600 hover:text-red-800 underline"
+              >
+                Dismiss
+              </button>
+            </div>
+          )}
+
+          {/* CTA - Button changes based on booking status */}
+          {bookingStatus === "none" && (
+            <button
+              onClick={handleConfirmPayment}
+              disabled={isProcessing}
+              className="w-full flex items-center justify-center gap-2 py-3.5 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors text-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {isProcessing ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <Wallet size={18} />
+                  Confirm & proceed to payment
+                </>
+              )}
+            </button>
+          )}
+
+          {bookingStatus === "pending" && (
+            <div className="w-full flex items-center justify-center gap-2 py-3.5 bg-yellow-100 text-yellow-800 rounded-xl text-sm">
+              <Clock size={18} />
+              Waiting for hospital acceptance...
+            </div>
+          )}
+
+          {bookingStatus === "accepted" && (
+            <div className="w-full flex items-center justify-center gap-2 py-3.5 bg-blue-100 text-blue-800 rounded-xl text-sm">
+              <AlertCircle size={18} />
+              Hospital accepted - Waiting for staff assignment
+            </div>
+          )}
+
+          {bookingStatus === "assigned" && (
+            <button
+              onClick={handleConfirmServices}
+              disabled={isProcessing}
+              className="w-full flex items-center justify-center gap-2 py-3.5 bg-green-600 hover:bg-green-700 text-white font-semibold rounded-xl transition-colors text-sm disabled:bg-gray-400 disabled:cursor-not-allowed"
+            >
+              {isProcessing ? (
+                <>
+                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <CheckCircle size={18} />
+                  Confirm services rendered
+                </>
+              )}
+            </button>
+          )}
+
+          {bookingStatus === "rejected" && (
+            <div className="w-full flex items-center justify-center gap-2 py-3.5 bg-red-100 text-red-800 rounded-xl text-sm">
+              <AlertCircle size={18} />
+              Request rejected - You have been refunded
+            </div>
+          )}
+
+          {bookingStatus === "completed" && (
+            <div className="w-full flex items-center justify-center gap-2 py-3.5 bg-green-100 text-green-800 rounded-xl text-sm">
+              <CheckCircle size={18} />
+              Services completed - Thank you!
+            </div>
+          )}
+
+          {/* Transaction Reference Display */}
+          {transactionRef && (
+            <div className="mt-4 p-4 bg-gray-50 border border-gray-200 rounded-lg">
+              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                Transaction Reference
+              </p>
+              <p className="font-mono text-sm text-gray-900 bg-white px-3 py-2 rounded border border-gray-300">
+                {transactionRef}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Right: Info Panel */}
@@ -299,6 +514,18 @@ export default function HospitalDetailPage() {
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      {modalConfig && (
+        <ConfirmModal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          onConfirm={modalConfig.onConfirm}
+          type={modalConfig.type}
+          title={modalConfig.title}
+          message={modalConfig.message}
+        />
+      )}
     </div>
   );
 }

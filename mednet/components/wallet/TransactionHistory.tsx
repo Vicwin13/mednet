@@ -45,10 +45,11 @@ export default function TransactionHistory({
             </div>
             <div className="text-right">
               <p
-                className={`font-bold ${tx.transaction_type === "funding" || tx.transaction_type === "booking_receipt" ? "text-green-600" : "text-red-600"}`}
+                className={`font-bold ${tx.transaction_type === "funding" || tx.transaction_type === "booking_receipt" || tx.transaction_type === "simulation" ? "text-green-600" : "text-red-600"}`}
               >
                 {tx.transaction_type === "funding" ||
-                tx.transaction_type === "booking_receipt"
+                tx.transaction_type === "booking_receipt" ||
+                tx.transaction_type === "simulation"
                   ? "+"
                   : "-"}
                 {tx.amount.toFixed(2)}

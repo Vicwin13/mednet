@@ -1,20 +1,25 @@
 import { NextResponse } from "next/server";
-import { getSupabaseClient } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 
 export async function GET(request: Request) {
   try {
-    const supabase = getSupabaseClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get('userId');
+
+    if (!userId) {
+      return NextResponse.json({ error: "userId is required" }, { status: 400 });
     }
+
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
     // First, get the user's wallet
     const { data: wallet, error: walletError } = await supabase
       .from("wallets")
       .select("id")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .single();
 
     if (walletError || !wallet) {

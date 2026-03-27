@@ -1,52 +1,34 @@
 import { NextResponse } from "next/server";
-import { getSupabaseClient } from "@/lib/supabase";
+import { createClient } from "@supabase/supabase-js";
 
 interface WithdrawRequest {
+  userId: string;
   amount: number;
-  bankAccountId: string;
+  bankAccountId?: string;
 }
 
 export async function POST(request: Request) {
   try {
-    const supabase = getSupabaseClient();
-    const { data: { user }, error: authError } = await supabase.auth.getUser();
-    
-    if (authError || !user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    // Get user's profile to verify role
-    const { data: profile, error: profileError } = await supabase
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
-    if (profileError || !profile) {
-      return NextResponse.json({ error: "Profile not found" }, { status: 404 });
-    }
-
-    // Only hospitals can withdraw
-    if (profile.role !== "hospital") {
-      return NextResponse.json({ error: "Forbidden: Only hospitals can withdraw" }, { status: 403 });
-    }
-
     const body: WithdrawRequest = await request.json();
-    const { amount, bankAccountId } = body;
+    const { userId, amount, bankAccountId } = body;
 
-    if (!amount || amount < 1000) {
-      return NextResponse.json({ error: "Minimum withdrawal is ₦1,000" }, { status: 400 });
+    if (!userId || !amount || amount < 1000) {
+      return NextResponse.json(
+        { error: "Minimum withdrawal is ₦1,000" },
+        { status: 400 }
+      );
     }
 
-    if (!bankAccountId) {
-      return NextResponse.json({ error: "Bank account is required" }, { status: 400 });
-    }
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
 
     // Get user's wallet
     const { data: wallet, error: walletError } = await supabase
       .from("wallets")
       .select("*")
-      .eq("user_id", user.id)
+      .eq("user_id", userId)
       .single();
 
     if (walletError || !wallet) {
@@ -58,20 +40,52 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Insufficient balance" }, { status: 400 });
     }
 
-    // TODO: Implement withdrawal logic with bank transfer
-    // For now, return a success response
-    // In production, this would:
-    // 1. Create a withdrawal transaction record
-    // 2. Deduct amount from wallet balance
-    // 3. Initiate bank transfer via payment gateway
-    // 4. Update transaction status
+    // Deduct from wallet
+    const newBalance = Number(wallet.balance) - amount;
 
-    return NextResponse.json({ 
-      success: true, 
+    const { error: updateError } = await supabase
+      .from("wallets")
+      .update({
+        balance: newBalance,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", wallet.id);
+
+    if (updateError) {
+      return NextResponse.json(
+        { error: "Failed to update wallet balance" },
+        { status: 500 }
+      );
+    }
+
+    // Create transaction record
+    const { error: transactionError } = await supabase
+      .from("wallet_transactions")
+      .insert({
+        wallet_id: wallet.id,
+        patient_id: userId,
+        transaction_type: "withdrawal",
+        amount: amount,
+        balance_after: newBalance,
+        reference: `WITHDRAW_${userId}_${Date.now()}`,
+        description: "Wallet withdrawal",
+        status: "completed",
+        metadata: {
+          bank_account_id: bankAccountId,
+          simulated_at: new Date().toISOString(),
+        },
+      });
+
+    if (transactionError) {
+      console.error("Failed to create transaction record:", transactionError);
+    }
+
+    return NextResponse.json({
+      success: true,
+      newBalance,
       message: "Withdrawal request submitted successfully",
-      note: "Bank transfer integration pending implementation"
     });
   } catch (error) {
-    return NextResponse.json({ error:error || "Internal server error" }, { status: 500 });
+    return NextResponse.json({ error: error || "Internal server error" }, { status: 500 });
   }
 }

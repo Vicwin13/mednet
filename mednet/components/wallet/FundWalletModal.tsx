@@ -1,5 +1,6 @@
 "use client";
 
+import ConfirmModal, { ModalType } from "@/components/ui/ConfirmModal";
 import { Loader2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 
@@ -28,6 +29,14 @@ export default function FundWalletModal({
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const { session, profile } = useAuth();
 
+  // Alert modal state
+  const [alertModalOpen, setAlertModalOpen] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<{
+    type: ModalType;
+    title: string;
+    message: string;
+  } | null>(null);
+
   // Load Interswitch inline checkout script
   useEffect(() => {
     if (isOpen && !scriptLoaded) {
@@ -47,7 +56,12 @@ export default function FundWalletModal({
 
   const handleFundWallet = async () => {
     if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) {
-      alert("Please enter a valid amount");
+      setAlertConfig({
+        type: "error",
+        title: "Invalid Amount",
+        message: "Please enter a valid amount",
+      });
+      setAlertModalOpen(true);
       return;
     }
 
@@ -252,6 +266,19 @@ export default function FundWalletModal({
             )}
           </button>
         </div>
+
+        {/* Alert Modal */}
+        {alertConfig && (
+          <ConfirmModal
+            isOpen={alertModalOpen}
+            onClose={() => setAlertModalOpen(false)}
+            type={alertConfig.type}
+            title={alertConfig.title}
+            message={alertConfig.message}
+            showCancel={false}
+            confirmText="OK"
+          />
+        )}
       </div>
     </div>
   );

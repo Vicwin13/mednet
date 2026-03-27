@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowDownToLine, CirclePlus } from "lucide-react";
+import { ArrowDownToLine, CirclePlus, DollarSign } from "lucide-react";
 
 import { Database } from "@/types/supabase";
 
@@ -9,14 +9,14 @@ type Wallet = Database["public"]["Tables"]["wallets"]["Row"];
 interface WalletCardProps {
   wallet: Wallet;
   userRole: "patient" | "hospital";
-  onFundClick?: () => void;
+  onSimulateClick?: () => void;
   onWithdrawClick?: () => void;
 }
 
 export default function WalletCard({
   wallet,
   userRole,
-  onFundClick,
+  onSimulateClick,
   onWithdrawClick,
 }: WalletCardProps) {
   return (
@@ -28,22 +28,14 @@ export default function WalletCard({
       </p>
 
       <div className="flex gap-3">
-        {/* Fund button - Patients only */}
-        {userRole === "patient" && onFundClick && (
-          <>
-            <button
-              onClick={onFundClick}
-              className="flex items-center justify-center gap-2 rounded-md hover:bg-amber-50 cursor-pointer bg-white text-blue-600 font-bold py-2.5 px-3"
-            >
-              <CirclePlus size={20} /> Fund Wallet
-            </button>
-            <button
-              onClick={onFundClick}
-              className="flex items-center justify-center gap-2 rounded-md hover:bg-amber-50 cursor-pointer bg-white text-blue-600 font-bold py-2.5 px-3"
-            >
-              <CirclePlus size={20} /> Simulate
-            </button>
-          </>
+        {/* Simulate button - Patients only */}
+        {userRole === "patient" && onSimulateClick && (
+          <button
+            onClick={onSimulateClick}
+            className="flex items-center justify-center gap-2 rounded-md hover:bg-amber-50 cursor-pointer bg-white text-blue-600 font-bold py-2.5 px-3"
+          >
+            <DollarSign size={20} /> Simulate Funding
+          </button>
         )}
 
         {/* Withdraw button - Hospitals only */}

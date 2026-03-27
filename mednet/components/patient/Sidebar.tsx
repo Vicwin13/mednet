@@ -16,11 +16,15 @@ import { usePathname } from "next/navigation";
 const patientNavItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "" },
   { icon: Building2, label: "Hospitals", href: "/dashboard/patient" },
-  { icon: CalendarDays, label: "Appointments", href: "" },
+  {
+    icon: CalendarDays,
+    label: "Appointments",
+    href: "/dashboard/patient/appointments",
+  },
   {
     icon: Wallet,
     label: "Wallet",
-    href: "/dashboard/wallet",
+    href: "/dashboard/patient/hospitals/patient-wallet",
   },
   { icon: Settings, label: "Settings", href: "" },
 ];

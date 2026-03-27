@@ -21,9 +21,12 @@ const Header = () => {
           />
         </Link>
 
-        <button className="p-3 rounded-lg bg-blue-600 text-white cursor-pointer">
+        <Link
+          href={"/mednet-wallet"}
+          className="p-3 rounded-lg bg-blue-600 text-white cursor-pointer"
+        >
           MedNet Wallet
-        </button>
+        </Link>
       </div>
 
       {/* Right side */}
