@@ -4,29 +4,35 @@ import { RefreshCw, Wallet } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { Database } from "@/types/supabase";
-import { useAuth } from "@/context/AuthContext";
+
+// import { useAuth } from "@/context/AuthContext";
 
 type Ledger = Database["public"]["Tables"]["ledger"]["Row"];
 
 export default function MednetWallet() {
-  const { user } = useAuth();
+  // const { user } = useAuth();
   const [balance, setBalance] = useState<number>(0);
   const [ledgerEntries, setLedgerEntries] = useState<Ledger[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
+    console.log('[DEBUG CLIENT] MednetWallet page: Component mounted, loading data...');
     loadWalletData();
   }, []);
 
   const loadWalletData = async () => {
+    console.log('[DEBUG CLIENT] MednetWallet page: loadWalletData called');
     try {
       setLoading(true);
 
       // Load Mednet wallet balance from API
+      console.log('[DEBUG CLIENT] MednetWallet page: Fetching balance...');
       const balanceResponse = await fetch("/api/mednet-wallet/balance");
+      console.log('[DEBUG CLIENT] MednetWallet page: Balance response:', balanceResponse.status, balanceResponse.ok);
       if (balanceResponse.ok) {
         const balanceData = await balanceResponse.json();
+        console.log('[DEBUG CLIENT] MednetWallet page: Balance data:', balanceData);
         setBalance(balanceData.balance || 0);
       }
 
@@ -37,13 +43,13 @@ export default function MednetWallet() {
         setLedgerEntries(ledgerData.entries || []);
       }
     } catch (error) {
-      console.error("Error loading Mednet wallet data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   const handleRefresh = async () => {
+    console.log('[DEBUG CLIENT] MednetWallet page: Refresh button clicked');
     setRefreshing(true);
     await loadWalletData();
     setRefreshing(false);
@@ -79,7 +85,7 @@ export default function MednetWallet() {
       </div>
 
       {/* Wallet Balance Card */}
-      <div className="bg-gradient-to-br from-blue-600 to-blue-700 rounded-2xl p-8 mb-8 text-white shadow-lg">
+      <div className="bg-linear-to-br from-blue-600 to-blue-700 rounded-2xl p-8 mb-8 text-white shadow-lg">
         <div className="flex items-center gap-3 mb-4">
           <Wallet size={32} className="opacity-80" />
           <h2 className="text-lg font-medium opacity-90">Current Balance</h2>

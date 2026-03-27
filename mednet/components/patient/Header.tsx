@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, ChevronDown, LogOut, User } from "lucide-react";
+import { Bell, ChevronDown, LogOut, User, Wallet } from "lucide-react";
 
 import Image from "next/image";
 import Link from "next/link";
@@ -28,14 +28,26 @@ const Header = () => {
   return (
     <header className="fixed top-0 left-0 right-0 h-16 bg-white border-b border-gray-100 flex items-center px-6 justify-between z-50">
       {/* Logo */}
+      <div className="flex items-center justify-center">
+
       <Link href={"/dashboard/patient"} className="flex items-center gap-2">
         <Image
           src={"/images/logo.png"}
           alt="MedNet-logo"
           width={239}
           height={65}
-        />
+          />
       </Link>
+
+      {/* Wallet Button */}
+      <Link
+        href="/mednet-wallet"
+        className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+      >
+        <Wallet size={18} />
+        <span className="text-sm font-medium">Wallet</span>
+      </Link>
+        </div>
 
       {/* Right side */}
       <div className="flex items-center gap-4">

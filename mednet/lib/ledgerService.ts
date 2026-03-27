@@ -24,21 +24,30 @@ export async function createLedgerEntry(
   transactionId: string | null = null,
   description: string | null = null
 ): Promise<Ledger> {
+  console.log('[DEBUG] createLedgerEntry: Called with:', { ownerId, ownerType, amount, entryType, transactionId, description });
+  
   const supabase = getSupabaseClient();
   
+  // For mednet entries, owner_id and transaction_id should be null (owner_type is used to identify them)
+  const ledgerOwnerId = ownerType === 'mednet' ? null : ownerId;
+  const ledgerTransactionId = ownerType === 'mednet' ? null : transactionId;
+  
+  console.log('[DEBUG] createLedgerEntry: Inserting into ledger table...');
   const { data, error } = await supabase
     .from('ledger')
     .insert({
-      owner_id: ownerId,
+      owner_id: ledgerOwnerId,
       owner_type: ownerType,
       amount: amount,
       entry_type: entryType,
-      transaction_id: transactionId,
+      transaction_id: ledgerTransactionId,
       description: description,
       created_at: new Date().toISOString(),
     } as LedgerInsert)
     .select()
     .single();
+  
+  console.log('[DEBUG] createLedgerEntry: Insert result - data:', data, 'error:', error);
   
   if (error) throw error;
   return data;

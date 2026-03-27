@@ -7,23 +7,27 @@ import { createClient } from '@supabase/supabase-js';
  * @returns Current balance
  */
 export async function getMednetBalance(): Promise<number> {
+  console.log('[DEBUG] getMednetBalance: Starting...');
+  
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
+
+  console.log('[DEBUG] getMednetBalance: Supabase client created');
+  console.log('[DEBUG] getMednetBalance: Querying mednet_wallets table...');
 
   const { data, error } = await supabase
     .from('mednet_wallets')
     .select('balance')
     .single();
 
-  if (error) {
-    console.error('Error fetching Mednet wallet balance:', error);
-    throw error;
-  }
+  console.log('[DEBUG] getMednetBalance: Query result:', { data, error });
 
-  if (!data) {
-    // Create if doesn't exist
+  // Handle PGRST116 error (table is empty) - create wallet
+  if (error && error.code === 'PGRST116') {
+    console.log('[DEBUG] getMednetBalance: Table is empty, creating new wallet...');
+    
     const { data: newWallet, error: insertError } = await supabase
       .from('mednet_wallets')
       .insert({ balance: 0, currency: 'NGN', is_active: true })
@@ -31,13 +35,25 @@ export async function getMednetBalance(): Promise<number> {
       .single();
     
     if (insertError) {
-      console.error('Error creating Mednet wallet:', insertError);
+      console.error('[DEBUG] getMednetBalance: Error creating wallet:', insertError);
       throw insertError;
     }
     
+    console.log('[DEBUG] getMednetBalance: Wallet created successfully:', newWallet);
     return newWallet?.balance || 0;
   }
 
+  if (error) {
+    console.error('[DEBUG] getMednetBalance: Unexpected error details:', {
+      message: error.message,
+      code: error.code,
+      details: error.details,
+      hint: error.hint
+    });
+    throw error;
+  }
+
+  console.log('[DEBUG] getMednetBalance: Returning balance:', data.balance);
   return data.balance;
 }
 
@@ -54,28 +70,37 @@ export async function updateMednetBalance(amount: number, type: 'credit' | 'debi
 
   const { data, error: fetchError } = await supabase
     .from('mednet_wallets')
-    .select('balance')
+    .select('id, balance')
     .single();
 
-  if (fetchError) {
+  // Handle PGRST116 error (table is empty) - create wallet first
+  if (fetchError && fetchError.code === 'PGRST116') {
+    console.log('[DEBUG] updateMednetBalance: Table is empty, creating new wallet...');
+    
+    const { error: insertError } = await supabase
+      .from('mednet_wallets')
+      .insert({ balance: 0, currency: 'NGN', is_active: true });
+    
+    if (insertError) {
+      console.error('[DEBUG] updateMednetBalance: Error creating wallet:', insertError);
+      throw insertError;
+    }
+  } else if (fetchError) {
     console.error('Error fetching Mednet wallet:', fetchError);
     throw fetchError;
   }
 
-  if (!data) {
-    throw new Error('Mednet wallet not found');
-  }
-
-  const newBalance = type === 'credit' 
-    ? data.balance + amount 
-    : data.balance - amount;
+  const newBalance = type === 'credit'
+    ? (data?.balance || 0) + amount
+    : (data?.balance || 0) - amount;
 
   const { error: updateError } = await supabase
     .from('mednet_wallets')
-    .update({ 
+    .update({
       balance: newBalance,
       updated_at: new Date().toISOString()
-    });
+    })
+    .eq('id', data?.id);
     
   if (updateError) {
     console.error('Error updating Mednet wallet:', updateError);
@@ -89,41 +114,59 @@ export async function updateMednetBalance(amount: number, type: 'credit' | 'debi
  * @param transactionId - Associated transaction ID
  */
 export async function recordPatientFunding(amount: number, transactionId: string): Promise<void> {
+  console.log('[DEBUG] recordPatientFunding: Called with amount:', amount, 'transactionId:', transactionId);
+  
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   );
 
+  console.log('[DEBUG] recordPatientFunding: Fetching mednet_wallets...');
   const { data, error: fetchError } = await supabase
     .from('mednet_wallets')
-    .select('balance')
+    .select('id, balance')
     .single();
+  
+  console.log('[DEBUG] recordPatientFunding: Fetch result - data:', data, 'error:', fetchError);
 
-  if (fetchError) {
+  // Handle PGRST116 error (table is empty) - create wallet first
+  if (fetchError && fetchError.code === 'PGRST116') {
+    console.log('[DEBUG] recordPatientFunding: Table is empty, creating new wallet...');
+    
+    const { error: insertError } = await supabase
+      .from('mednet_wallets')
+      .insert({ balance: 0, currency: 'NGN', is_active: true });
+    
+    if (insertError) {
+      console.error('[DEBUG] recordPatientFunding: Error creating wallet:', insertError);
+      throw insertError;
+    }
+  } else if (fetchError) {
     console.error('Error fetching Mednet wallet for funding:', fetchError);
     throw fetchError;
   }
 
-  if (!data) {
-    throw new Error('Mednet wallet not found');
-  }
-
   // Update balance
-  const newBalance = data.balance + amount;
+  const newBalance = (data?.balance || 0) + amount;
+  console.log('[DEBUG] recordPatientFunding: Updating mednet_wallets balance from', data?.balance, 'to', newBalance);
 
   const { error: updateError } = await supabase
     .from('mednet_wallets')
-    .update({ 
+    .update({
       balance: newBalance,
       updated_at: new Date().toISOString()
-    });
+    })
+    .eq('id', data?.id);
     
   if (updateError) {
-    console.error('Error updating Mednet wallet for funding:', updateError);
+    console.error('[DEBUG] recordPatientFunding: Error updating Mednet wallet for funding:', updateError);
     throw updateError;
   }
+  
+  console.log('[DEBUG] recordPatientFunding: Successfully updated mednet_wallets balance');
 
   // Create ledger entry
+  console.log('[DEBUG] recordPatientFunding: Creating ledger entry...');
   await createLedgerEntry(
     'mednet',
     'mednet',
@@ -132,6 +175,7 @@ export async function recordPatientFunding(amount: number, transactionId: string
     transactionId,
     'Patient wallet funding'
   );
+  console.log('[DEBUG] recordPatientFunding: Successfully created ledger entry');
 }
 
 /**
@@ -148,27 +192,36 @@ export async function recordHospitalPayment(amount: number, transactionId: strin
 
   const { data, error: fetchError } = await supabase
     .from('mednet_wallets')
-    .select('balance')
+    .select('id, balance')
     .single();
 
-  if (fetchError) {
+  // Handle PGRST116 error (table is empty) - create wallet first
+  if (fetchError && fetchError.code === 'PGRST116') {
+    console.log('[DEBUG] recordHospitalPayment: Table is empty, creating new wallet...');
+    
+    const { error: insertError } = await supabase
+      .from('mednet_wallets')
+      .insert({ balance: 0, currency: 'NGN', is_active: true });
+    
+    if (insertError) {
+      console.error('[DEBUG] recordHospitalPayment: Error creating wallet:', insertError);
+      throw insertError;
+    }
+  } else if (fetchError) {
     console.error('Error fetching Mednet wallet for payment:', fetchError);
     throw fetchError;
   }
 
-  if (!data) {
-    throw new Error('Mednet wallet not found');
-  }
-
   // Update balance
-  const newBalance = data.balance - amount;
+  const newBalance = (data?.balance || 0) - amount;
 
   const { error: updateError } = await supabase
     .from('mednet_wallets')
-    .update({ 
+    .update({
       balance: newBalance,
       updated_at: new Date().toISOString()
-    });
+    })
+    .eq('id', data?.id);
     
   if (updateError) {
     console.error('Error updating Mednet wallet for payment:', updateError);
@@ -199,27 +252,35 @@ export async function recordPatientRefund(amount: number, transactionId: string)
 
   const { data, error: fetchError } = await supabase
     .from('mednet_wallets')
-    .select('balance')
+    .select('id, balance')
     .single();
 
-  if (fetchError) {
+  // Handle PGRST116 error (table is empty) - create wallet first
+  if (fetchError && fetchError.code === 'PGRST116') {
+    
+    const { error: insertError } = await supabase
+      .from('mednet_wallets')
+      .insert({ balance: 0, currency: 'NGN', is_active: true });
+    
+    if (insertError) {
+      console.error('[DEBUG] recordPatientRefund: Error creating wallet:', insertError);
+      throw insertError;
+    }
+  } else if (fetchError) {
     console.error('Error fetching Mednet wallet for refund:', fetchError);
     throw fetchError;
   }
 
-  if (!data) {
-    throw new Error('Mednet wallet not found');
-  }
-
   // Update balance
-  const newBalance = data.balance - amount;
+  const newBalance = (data?.balance || 0) - amount;
 
   const { error: updateError } = await supabase
     .from('mednet_wallets')
-    .update({ 
+    .update({
       balance: newBalance,
       updated_at: new Date().toISOString()
-    });
+    })
+    .eq('id', data?.id);
     
   if (updateError) {
     console.error('Error updating Mednet wallet for refund:', updateError);
