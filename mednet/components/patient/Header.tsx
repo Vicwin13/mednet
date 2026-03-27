@@ -71,7 +71,7 @@ const Header = () => {
           <div className="absolute right-6 top-16 mt-2 w-44 bg-white border border-gray-300 rounded-lg shadow-md z-50">
             <button
               onClick={handleSignOut}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
             >
               <LogOut size={16} /> Sign out
             </button>
