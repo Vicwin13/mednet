@@ -1,5 +1,5 @@
 export interface Hospital {
-  id: number;
+  id: string | number;
   name: string;
   location: string;
   distance: string;
@@ -8,11 +8,16 @@ export interface Hospital {
   extraCount: number;
   fee: string;
   image: string;
+  // Additional fields from database
+  address?: string;
+  city?: string;
+  cac?: string;
+  verified?: boolean;
 }
 
 export const hospitals: Hospital[] = [
   {
-    id: 1,
+    id: "1",
     name: "St. Mary Medical Center",
     location: "Downtown Medical District",
     distance: "4.2 km",
@@ -23,7 +28,7 @@ export const hospitals: Hospital[] = [
     image: "/images/hospital1.jpg"
   },
   {
-    id: 2,
+    id: "2",
     name: "Lagos General Hospital",
     location: "Victoria Island, Lagos",
     distance: "7.1 km",
@@ -34,7 +39,7 @@ export const hospitals: Hospital[] = [
     image: "/images/hospital2.jpg"
   },
   {
-    id: 3,
+    id: "3",
     name: "Eko Specialist Hospital",
     location: "Lekki Phase 1",
     distance: "9.8 km",
@@ -45,7 +50,7 @@ export const hospitals: Hospital[] = [
     image: "/images/hospital3.jpg"
   },
   {
-    id: 4,
+    id: "4",
     name: "HealthBridge Clinic",
     location: "Ikeja, Lagos",
     distance: "5.5 km",

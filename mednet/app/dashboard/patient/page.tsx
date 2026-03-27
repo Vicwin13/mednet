@@ -2,6 +2,7 @@
 
 import AuthProtected from "@/components/AuthProtected";
 import FilterBar from "@/components/patient/Filterbar";
+import { Hospital } from "@/app/data/hospitals";
 import HospitalCard from "@/components/patient/HospitalCard";
 import SearchBar from "@/components/patient/Searchbar";
 import { hospitals } from "@/app/data/hospitals";

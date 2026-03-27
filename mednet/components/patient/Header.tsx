@@ -4,13 +4,13 @@ import { Bell, ChevronDown, LogOut, User } from "lucide-react";
 
 import Image from "next/image";
 import Link from "next/link";
+import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { toast } from "sonner";
 
 const Header = () => {
-  const {profile, signOut} = useAuth();
+  const { profile, signOut } = useAuth();
   const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -18,9 +18,9 @@ const Header = () => {
     try {
       await signOut();
       router.push("/auth");
-      toast.success("Signout successfully")
+      toast.success("Signout successfully");
     } catch (err) {
-      toast.warning("Technical error occured while signing out")
+      toast.warning("Technical error occured while signing out");
       console.error("Sign out error:", err);
     }
   };
@@ -45,8 +45,9 @@ const Header = () => {
         </button>
 
         <button
-        onClick={() => setMenuOpen((prev) => !prev)}
-        className="flex items-center gap-3 pl-2 pr-3 py-1.5 hover:bg-gray-50 rounded-lg transition-colors">
+          onClick={() => setMenuOpen((prev) => !prev)}
+          className="flex items-center gap-3 pl-2 pr-3 py-1.5 hover:bg-gray-50 rounded-lg transition-colors"
+        >
           <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
             <User size={16} className="text-gray-600" />
           </div>
@@ -58,7 +59,7 @@ const Header = () => {
             <p
               className={`text-xs text-gray-500 leading-tight ${profile?.verified === false ? "text-red-500" : "text-green-600"}`}
             >
-              {profile?.verified === false
+              {profile?.role === "patient" && profile?.verified === false
                 ? "Unverified Personnel"
                 : "Verified Personnel"}
             </p>
@@ -67,15 +68,15 @@ const Header = () => {
         </button>
 
         {menuOpen && (
-        <div className="absolute right-6 top-16 mt-2 w-44 bg-white border border-gray-300 rounded-lg shadow-md z-50">
-          <button
-            onClick={handleSignOut}
-            className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
-          >
-            <LogOut size={16} /> Sign out
-          </button>
-        </div>
-      )}
+          <div className="absolute right-6 top-16 mt-2 w-44 bg-white border border-gray-300 rounded-lg shadow-md z-50">
+            <button
+              onClick={handleSignOut}
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            >
+              <LogOut size={16} /> Sign out
+            </button>
+          </div>
+        )}
       </div>
     </header>
   );

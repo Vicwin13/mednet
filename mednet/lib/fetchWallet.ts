@@ -9,6 +9,7 @@ export async function fetchWallet(userId: string) {
     .eq("user_id", userId)
     .single();
 
+  console.log("wallet:", data, "walletError:", error);
   if (error) throw error;
   return data;
 }

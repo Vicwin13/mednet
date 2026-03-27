@@ -50,9 +50,9 @@ const AuthContext = createContext<AuthContextType>({
   session: null,
   profile: null,
   loading: true,
-  signIn: async () => { },
-  signUp: async () => { },
-  signOut: async () => { },
+  signIn: async () => {},
+  signUp: async () => {},
+  signOut: async () => {},
 });
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
@@ -123,7 +123,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
       if (error) throw error;
 
+      if (data.user && data.user.identities?.length === 0) {
+        throw new Error("An account with this email already exists.");
+      }
+
       const user = data.user;
+
       if (user && data.session) {
         // Profile is automatically created by the database trigger
         // Just fetch it after a short delay to ensure the trigger has fired

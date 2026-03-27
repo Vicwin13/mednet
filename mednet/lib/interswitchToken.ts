@@ -1,17 +1,25 @@
 let accessToken: string | null = null;
 let expiryTime: number | null = null;
-let merchantCode: string | null = null;
 
-export function getMerchantCode() {
-return merchantCode;
+export function getMerchantCode(): string {
+  // Merchant code is a fixed value from your Interswitch account
+  // It should be set in your environment variables
+  const merchantCode = process.env.INTERSWITCH_MERCHANT_CODE;
+  
+  if (!merchantCode) {
+    throw new Error("INTERSWITCH_MERCHANT_CODE environment variable is not set");
+  }
+  
+  return merchantCode;
 }
-export async function getAccessToken() {
+
+export async function getAccessToken(): Promise<string> {
   const now = Date.now();
 
   // ✅ Reuse token if still valid
   if (accessToken && expiryTime && now < expiryTime) {
     return accessToken;
-    }
+  }
 
   const res = await fetch("https://apps.qa.interswitchng.com/passport/oauth/token", {
     method: "POST",
@@ -23,22 +31,23 @@ export async function getAccessToken() {
     },
     body: "grant_type=client_credentials",
   });
-    
-      if (!res.ok) {
+
+  if (!res.ok) {
     throw new Error(`Failed to get access token: ${res.status}`);
   }
 
-    const data = await res.json();
-    
-    if (!data.access_token) {
+  const data = await res.json();
+
+  if (!data.access_token) {
     throw new Error("No access token in response");
   }
 
-  accessToken = data.access_token;
-  merchantCode = data.merchant_code;
+  const token : string = data.access_token;
+
+  accessToken = token;
 
   // ⏳ Save expiry (convert seconds → ms)
-    expiryTime = now + data.expires_in * 1000;
+  expiryTime = now + data.expires_in * 1000;
 
   return accessToken;
 }
