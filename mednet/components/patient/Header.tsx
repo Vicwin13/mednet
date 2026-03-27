@@ -57,11 +57,11 @@ const Header = () => {
               {profile?.lastname}
             </p>
             <p
-              className={`text-xs text-gray-500 leading-tight ${profile?.verified === false ? "text-red-500" : "text-green-600"}`}
+              className={`text-xs text-gray-500 leading-tight ${profile?.role === "patient" && profile?.verified === false ? "text-red-500" : "text-green-600"}`}
             >
-              {profile?.role === "patient" && profile?.verified === false
-                ? "Unverified Personnel"
-                : "Verified Personnel"}
+              {profile?.role === "patient" ? profile?.verified ? "Verified Personnel"
+                : "Unverified Personnel"
+                : "Verified Hospital"}
             </p>
           </div>
           <ChevronDown size={16} className="text-gray-400" />
