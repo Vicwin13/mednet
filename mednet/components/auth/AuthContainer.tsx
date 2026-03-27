@@ -1,5 +1,6 @@
 "use client";
 
+import { ArrowLeft } from "lucide-react";
 import HospitalLoginForm from "./HospitalLoginForm";
 import HospitalSignUpForm from "./HospitalSignUpForm";
 import ModeToggle from "./ModeToggle";
@@ -7,6 +8,7 @@ import PatientLoginForm from "./PatientLoginForm";
 import PatientSignUpForm from "./PatientSignUpForm";
 import RoleToggle from "./RoleToggle";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function AuthContainer() {
   const [mode, setMode] = useState<"login" | "signup">("login");
@@ -24,6 +26,13 @@ export default function AuthContainer() {
       <div className="w-full min-h-screen bg-white shadow-lg  flex items-center overflow-hidden">
         {/* LEFT SIDE DESIGN PANEL */}
         <div className="w-1/2 bg-blue-600 border-4 h-screen text-white p-8 flex flex-col justify-center">
+          <Link
+            href="/"
+            className="w-1/3 h-10 mb-20 inline-flex items-center gap-2 px-8 py-4 bg-white text-blue-600 font-bold rounded-xl hover:bg-blue-50 transition-all shadow-lg text-sm"
+          >
+            <ArrowLeft size={16} />
+            Back to Home
+          </Link>
           <h2 className="text-2xl font-bold">
             {role === "patient" ? "Patient Portal" : "Hospital Portal"}
           </h2>

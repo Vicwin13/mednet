@@ -58,7 +58,7 @@ const Header = () => {
 
         <button
           onClick={() => setMenuOpen((prev) => !prev)}
-          className="flex items-center gap-3 pl-2 pr-3 py-1.5 hover:bg-gray-50 rounded-lg transition-colors"
+          className="flex items-center gap-3 pl-2 pr-3 py-1.5 hover:bg-gray-50 rounded-lg transition-colors cursor-pointer"
         >
           <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
             <User size={16} className="text-gray-600" />
@@ -69,11 +69,11 @@ const Header = () => {
               {profile?.lastname}
             </p>
             <p
-              className={`text-xs text-gray-500 leading-tight ${profile?.verified === false ? "text-red-500" : "text-green-600"}`}
+              className={`text-xs text-gray-500 leading-tight ${profile?.role === "patient" && profile?.verified === false ? "text-red-500" : "text-green-600"}`}
             >
-              {profile?.role === "patient" && profile?.verified === false
-                ? "Unverified Personnel"
-                : "Verified Personnel"}
+              {profile?.role === "patient" ? profile?.verified ? "Verified Personnel"
+                : "Unverified Personnel"
+                : "Verified Hospital"}
             </p>
           </div>
           <ChevronDown size={16} className="text-gray-400" />
@@ -83,7 +83,7 @@ const Header = () => {
           <div className="absolute right-6 top-16 mt-2 w-44 bg-white border border-gray-300 rounded-lg shadow-md z-50">
             <button
               onClick={handleSignOut}
-              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              className="flex items-center gap-2 w-full px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
             >
               <LogOut size={16} /> Sign out
             </button>
